@@ -92,6 +92,7 @@ common to all mouse events like position.
 type alias MouseEvent =
     { clientPos : Position
     , targetPos : Position
+    , offsetPos : Position
     }
 
 
@@ -102,19 +103,22 @@ relPos ev =
     Position (ev.clientPos.x - ev.targetPos.x) (ev.clientPos.y - ev.targetPos.y)
 
 
-mouseEvent : Float -> Float -> Rectangle -> MouseEvent
-mouseEvent clientX clientY target =
+mouseEvent : Float -> Float -> Float -> Float -> Rectangle -> MouseEvent
+mouseEvent clientX clientY offsetX offsetY target =
     { clientPos = Position (truncate clientX) (truncate clientY)
     , targetPos = Position (truncate target.left) (truncate target.top)
+    , offsetPos = Position (truncate offsetX) (truncate offsetY)
     }
 
 
 mouseEventDecoder : Decode.Decoder MouseEvent
 mouseEventDecoder =
-    Decode.map3
+    Decode.map5
         mouseEvent
         (field "clientX" Decode.float)
         (field "clientY" Decode.float)
+        (field "offsetX" Decode.float)
+        (field "offsetY" Decode.float)
         (field "target" DOM.boundingClientRect)
 
 
